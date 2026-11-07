@@ -1,0 +1,129 @@
+
+//
+// FPS
+//
+SetTargetFPS(int fps) ............................................................................ // Установка FPS
+GetFPS() ......................................................................................... // Возвращает FPS
+GetFrameTime() ................................................................................... // Delta time
+
+//
+// SCREEN
+//
+GetScreenWidth() ................................................................................. // Возвращает ширину окна
+GetScreenHeight() ................................................................................ // Возвращает высоту окна
+
+void WaitTime(double seconds) .................................................................... // Останавливает программу на указанное количиство секунд
+
+//
+// DRAWING TEXT
+//
+DrawText(char *text, int x, int y, int font_size, Color font_color) .............................. // Печатает тект
+TextFormat(char *fortmat, args) .................................................................. // Аналогична printf
+
+//
+// DRAWING SHAPES
+//
+DrawCircle(int x, int y, int radius, Color color) ................................................ // Рисует круг
+DrawCircleV(Vector2 vector, int radius, Color color) ............................................. // Рисует круг с центром заданным в структуре Vector22
+DrawRectangle(int x, int y, int width, int height, Color color) .................................. // Рисует прямоугольник
+DrawRectangleV(Vector2 position, Vector2 size, Color color) ...................................... // Рисует прямоугольник
+DrawRectanglePro(Rectangle rec, Vector2 origin, float rotation, Color color) ..................... // Рисует прямоугольник с поворотом вокруг центра origin. !!! Rotation в градусах !!!
+
+//
+// IMAGE
+//
+Image LoadImage(const char *fileName) ............................................................ // Загружает изображение из файла в память GPU
+void ImageRotate(Image *image, int degrees) ...................................................... // Поворот изображения на указанный угол
+void ImageRotateCW(Image *image) ................................................................. // Поворот изображения на 90 градусов по часовой стрелке
+void ImageRotateCCW(Image *image) ................................................................ // Поворот изображения на 90 градусов против часовой стрелке
+void UnloadImage(Image image) .................................................................... // Выгружает картинку из памяти GPU
+
+//
+// TEXTURE
+//
+Texture2D LoadTexture(const char *fileName) ...................................................... // Загружает текстуру из файла в память GPU
+Texture2D LoadTextureFromImage(Image image) ...................................................... // Загружает текстуру из image
+void UnloadTexture(Texture2D texture) ............................................................ // Выгружает текстуру из памяти GPU
+
+//
+// DRAWING TEXTURE
+//
+DrawTexture(Texture2D texture, int posX, int posY, Color tint)
+DrawRectanglePro(Rectangle rec, Vector2 origin, float rotation, Color color)
+DrawTexturePro(
+	Texture2D texture, // Загруженная текстура
+	Rectangle source,  // Rectangle, который определяет координаты и размеры текстуры
+	Rectangle dest,    // Rectangle, который определяет, куда будет рисоваться текстура
+	Vector2 origin,
+	float rotation,
+	Color tint
+) ................................................................................................ // Draw a part of a texture defined by a rectangle with 'pro' parameters
+
+void ImageClearBackground(Image *dst, Color color) ............................................... // Очищает фон указанной картинкой. То есть помещает изображение на фон.
+
+// KEYBOARD
+IsKeyDown(KEY_NAME) .............................................................................. // Проверяет нажатие указанной клавиши
+
+//
+// TIME
+//
+double GetTime(void) ............................................................................. // Get elapsed time in seconds since InitWindow()
+float GetFrameTime(void) ......................................................................... // Get time in seconds for last frame drawn (delta time)
+
+//
+// BUFFERS
+//
+void SwapScreenBuffer(void) ...................................................................... // Swap back buffer with front buffer (screen drawing)
+
+//
+// COLLISIONS
+//
+bool CheckCollisionRecs(Rectangle rec1, Rectangle rec2) .......................................... // Check collision between two rectangles                                                                                        
+bool CheckCollisionCircles(Vector2 center1, float radius1, Vector2 center2, float radius2) ....... // Check collision between two circles
+bool CheckCollisionCircleRec(Vector2 center, float radius, Rectangle rec) ........................ // Check collision between circle and rectangle
+bool CheckCollisionCircleLine(Vector2 center, float radius, Vector2 p1, Vector2 p2) .............. // Check if circle collides with a line created betweeen two points [p1] and [p2]
+bool CheckCollisionPointRec(Vector2 point, Rectangle rec) ........................................ // Check if point is inside rectangle
+bool CheckCollisionPointCircle(Vector2 point, Vector2 center, float radius) ...................... // Check if point is inside circle
+bool CheckCollisionPointTriangle(Vector2 point, Vector2 p1, Vector2 p2, Vector2 p3) .............. // Check if point is inside a triangle
+bool CheckCollisionPointLine(Vector2 point, Vector2 p1, Vector2 p2, int threshold) ............... // Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]
+bool CheckCollisionPointPoly(Vector2 point, const Vector2 *points, int pointCount) ............... // Check if point is within a polygon described by array of vertices
+bool CheckCollisionLines(
+	Vector2 startPos1,
+	Vector2 endPos1,
+	Vector2 startPos2,
+	Vector2 endPos2,
+	Vector2 *collisionPoint
+) ................................................................................................ // Check the collision between two lines defined by two points each, returns collision point by reference
+Rectangle GetCollisionRec(Rectangle rec1, Rectangle rec2) ........................................ // Get collision rectangle for two rectangles collision
+
+//
+// IMAGE GENERATION
+//
+Image GenImageColor(int width, int height, Color color) .......................................... // Generate image: plain color
+Image GenImageGradientLinear(int width, int height, int direction, Color start, Color end) ....... // Generate image: linear gradient, direction in degrees [0..360], 0=Vertical gradient
+Image GenImageGradientRadial(int width, int height, float density, Color inner, Color outer) ..... // Generate image: radial gradient
+Image GenImageGradientSquare(int width, int height, float density, Color inner, Color outer) ..... // Generate image: square gradient
+Image GenImageChecked(int width, int height, int checksX, int checksY, Color col1, Color col2) ... // Generate image: checked
+Image GenImageWhiteNoise(int width, int height, float factor) .................................... // Generate image: white noise
+Image GenImagePerlinNoise(int width, int height, int offsetX, int offsetY, float scale) .......... // Generate image: perlin noise
+Image GenImageCellular(int width, int height, int tileSize) ...................................... // Generate image: cellular algorithm, bigger tileSize means bigger cells
+Image GenImageText(int width, int height, const char *text) ...................................... // Generate image: grayscale image from text data
+
+
+
+
+// ==================================================
+// Camera
+// ==================================================
+
+//
+// Camera2D, defines position/orientation in 2d space
+//
+typedef struct Camera2D {
+    Vector2 offset;         // Camera offset (screen space offset from window origin)
+    Vector2 target;         // Camera target (world space target point that is mapped to screen space offset)
+    float rotation;         // Camera rotation in degrees (pivots around target)
+    float zoom;             // Camera zoom (scaling around target), must not be set to 0, set to 1.0f for no scale
+} Camera2D;
+
+void BeginMode2D(Camera2D camera) ................................................................ // Begin 2D mode with custom camera (2D)
