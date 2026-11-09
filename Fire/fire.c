@@ -33,6 +33,8 @@ typedef struct {
 	size_t size;
 } App;
 
+typedef void (*Frame)(App *app, Color *curr_pixel, Color *prev_pixel);
+
 // =============================================================================
 // @@@ + App_pixel_fade
 // =============================================================================
@@ -60,40 +62,55 @@ Color* App_pixel_fade(Color *color)
 }
 
 // =============================================================================
-// @@@ + App_first_frame
+// @@@ + App_init_frame
 // =============================================================================
-void App_first_frame(App *app)
+void App_init_frame(App *app)
 {
-	Color *p = app->pixels + (WINDOW_HEIGHT - 1) * WINDOW_WIDTH;
+	Color *p = app->pixels + app->size - WINDOW_WIDTH;
 
 	for (int i = 0; i < WINDOW_WIDTH; i++)
 		*p++ = color_white;
-	
-	for (int row = WINDOW_HEIGHT - 2; row >= 0; row--)
-	{
-		Color *curr_pixel = app->pixels + row * WINDOW_WIDTH;
-		Color *prev_pixel = curr_pixel + WINDOW_WIDTH;
+}
 
-		for (int col = 0; col < WINDOW_WIDTH; col++)
-		{
-			Color color = *prev_pixel;
+// =============================================================================
+// @@@ + App_first_frame
+// =============================================================================
+void App_first_frame(App *app, Color *curr_pixel, Color *prev_pixel)
+{
+	Color color = *prev_pixel;
 
-			if (GetRandomValue(0, 99) > 50)
-				App_pixel_fade(&color);
+	if (GetRandomValue(0, 99) > 50)
+		App_pixel_fade(&color);
 
-			*curr_pixel = color;
-
-			curr_pixel++;
-			prev_pixel++;
-		}
-	}
-	// App_next_frame(app);
+	*curr_pixel = color;
 }
 
 // =============================================================================
 // @@@ + App_next_frame
 // =============================================================================
-void App_next_frame(App *app)
+void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel)
+{
+    int value = GetRandomValue(0, 99);
+
+	if (value > OFFSET_RANDOM_FACTOR)
+	{
+		int offset = curr_pixel > (app->pixels + OFFSET_FACTOR) && prev_pixel < (app->pixels + app->size - OFFSET_FACTOR - 1) ? GetRandomValue(0, 2) - 1 : 0;
+		*curr_pixel = prev_pixel[offset * OFFSET_FACTOR];
+
+		return;
+	}
+
+	if (value > REPEAT_RANDOM_FACTOR)
+	{
+		Color color = *prev_pixel;
+		*curr_pixel = *App_pixel_fade(&color);
+	}
+}
+
+// =============================================================================
+// @@@ + App_update
+// =============================================================================
+void App_update(App *app, Frame frame_callback)
 {
 	for (int row = WINDOW_HEIGHT - 2; row >= 0; row--)
 	{
@@ -102,27 +119,10 @@ void App_next_frame(App *app)
 
 		for (int col = 0; col < WINDOW_WIDTH; col++)
 		{
-		    int value = GetRandomValue(0, 99);
+		    frame_callback(app, curr_pixel, prev_pixel);
 
-			if (value > OFFSET_RANDOM_FACTOR)
-			{
-    			int offset = curr_pixel > (app->pixels + OFFSET_FACTOR) && prev_pixel < (app->pixels + app->size - OFFSET_FACTOR - 1) ? GetRandomValue(0, 2) - 1 : 0;
-    			*curr_pixel = prev_pixel[offset * OFFSET_FACTOR];
-
-    			prev_pixel++;
-    			curr_pixel++;
-    			
-    			continue;
-			}
-
-			if (value > REPEAT_RANDOM_FACTOR)
-			{
-				Color color = *prev_pixel;
-				*curr_pixel = *App_pixel_fade(&color);
-			}
-
-			prev_pixel++;
 			curr_pixel++;
+			prev_pixel++;
 		}
 	}
 }
@@ -159,13 +159,16 @@ int main()
 	// Color *pixels = LoadImageColors(image);
 
 	app.pixels = LoadImageColors(image);
-	App_first_frame(&app);
+	// App_first_frame(&app);
+	App_init_frame(&app);
+	App_update(&app, App_first_frame);
 
 	while(!WindowShouldClose() && !IsKeyDown(KEY_Q))
 	{
 		// ClearBackground((Color) {0, 0, 0});
 		
-		App_next_frame(&app);
+		// App_next_frame(&app);
+		App_update(&app, App_next_frame);
 		UpdateTexture(texture, app.pixels);
 
 		BeginDrawing();
