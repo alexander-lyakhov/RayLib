@@ -130,24 +130,19 @@ void App_update(App *app, Frame frame_callback)
 // =============================================================================
 // @@@ + App_listen
 // =============================================================================
-int App_listen(App *app)
+/*int App_listen(App *app)
 {
 	if (IsKeyDown(KEY_Q))
 		return 0;
-}
+}*/
 
 int main()
 {
 	SetTraceLogLevel(LOG_NONE);
 
-	App app = {
-		.size = WINDOW_WIDTH * WINDOW_HEIGHT
-	};
-	
 	SetTargetFPS(TARGET_FPS);
 
 	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "RayLib");
-	// SetRandomSeed();
 
 	Image image = GenImageColor(
 		WINDOW_WIDTH,
@@ -156,18 +151,17 @@ int main()
 	);
 
 	Texture2D texture = LoadTextureFromImage(image);
-	// Color *pixels = LoadImageColors(image);
 
-	app.pixels = LoadImageColors(image);
-	// App_first_frame(&app);
+	App app = {
+		.size   = WINDOW_WIDTH * WINDOW_HEIGHT,
+		.pixels = LoadImageColors(image),
+	};
+
 	App_init_frame(&app);
 	App_update(&app, App_first_frame);
 
 	while(!WindowShouldClose() && !IsKeyDown(KEY_Q))
 	{
-		// ClearBackground((Color) {0, 0, 0});
-		
-		// App_next_frame(&app);
 		App_update(&app, App_next_frame);
 		UpdateTexture(texture, app.pixels);
 
