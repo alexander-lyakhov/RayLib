@@ -5,17 +5,17 @@
 #define WINDOW_WIDTH  1024
 #define WINDOW_HEIGHT  768
 /*
-#define FADE_TO_YELLOW  25 // 15
-#define FADE_TO_RED     20 //  3
-#define FADE_TO_BLACK   15 //  5
+#define WHITE_TO_YELLOW  25 // 15
+#define YELLOW_TO_RED     20 //  3
+#define RED_TO_BLACK   15 //  5
 
 #define OFFSET_RANDOM_FACTOR 40
 #define REPEAT_RANDOM_FACTOR 25
 */
 
-#define FADE_TO_YELLOW  40 // 15
-#define FADE_TO_RED     30 //  3
-#define FADE_TO_BLACK   20 //  5
+#define WHITE_TO_YELLOW   40 // 15
+#define YELLOW_TO_RED     30 //
+#define RED_TO_BLACK      20 //  5
 
 #define OFFSET_RANDOM_FACTOR 30 // Flame height. Smallest value - heighest flame size
 #define REPEAT_RANDOM_FACTOR 20 // Burning speed. Smallest value - fastest speed
@@ -39,24 +39,25 @@ typedef struct {
 Color* App_pixel_fade(Color *color)
 {
 	if (color->b)
-		color->b -= color->b > FADE_TO_YELLOW
-			? FADE_TO_YELLOW
+		color->b -= color->b > WHITE_TO_YELLOW
+			? WHITE_TO_YELLOW
 			: color->b;
 
 	if (!color->b && color->g)
-		color->g -= color->g > FADE_TO_RED
-			? FADE_TO_RED
+		color->g -= color->g > YELLOW_TO_RED
+			? YELLOW_TO_RED
 			: color->g;
 
 	if (!color->b && !color->g && color->r)
-		color->r -= color->r > FADE_TO_BLACK
-			? FADE_TO_BLACK
-			: color->r;
+		if (color->r < 80)
+			color->r--;
+		else
+			color->r -= color->r > RED_TO_BLACK
+				? RED_TO_BLACK
+				: color->r;
 
 	return color;
 }
-
-// void App_next_frame(App *app);
 
 // =============================================================================
 // @@@ + App_first_frame
@@ -126,6 +127,15 @@ void App_next_frame(App *app)
 	}
 }
 
+// =============================================================================
+// @@@ + App_listen
+// =============================================================================
+int App_listen(App *app)
+{
+	if (IsKeyDown(KEY_Q))
+		return 0;
+}
+
 int main()
 {
 	SetTraceLogLevel(LOG_NONE);
@@ -151,7 +161,7 @@ int main()
 	app.pixels = LoadImageColors(image);
 	App_first_frame(&app);
 
-	while(!WindowShouldClose())
+	while(!WindowShouldClose() && !IsKeyDown(KEY_Q))
 	{
 		// ClearBackground((Color) {0, 0, 0});
 		
@@ -161,7 +171,6 @@ int main()
 		BeginDrawing();
 			DrawTexture(texture, 0, 0, color_white);
 		EndDrawing();
-
 	}
 
 	UnloadTexture(texture);
