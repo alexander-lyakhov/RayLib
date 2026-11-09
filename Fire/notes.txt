@@ -10,6 +10,10 @@ RLAPI void UnloadImageColors(Color *colors);                                    
 RLAPI Color GetPixelColor(void *srcPtr, int format);                        // Get Color from a source pixel pointer of certain format
 RLAPI void SetPixelColor(void *dstPtr, Color color, int format);            // Set color formatted into destination pixel pointer
 
+RLAPI int GetScreenWidth(void);                                   // Get current screen width
+RLAPI int GetScreenHeight(void);                                  // Get current screen height
+
+
 //
 // https://www.raylib.com/examples/textures/loader.html?name=textures_image_generation
 // https://www.raylib.com/examples/textures/loader.html?name=textures_image_processing
