@@ -14,8 +14,8 @@
 */
 
 #define FADE_TO_YELLOW  40 // 15
-#define FADE_TO_RED     25 //  3
-#define FADE_TO_BLACK   30 //  5
+#define FADE_TO_RED     30 //  3
+#define FADE_TO_BLACK   20 //  5
 
 #define OFFSET_RANDOM_FACTOR 30 // Flame height. Smallest value - heighest flame size
 #define REPEAT_RANDOM_FACTOR 20 // Burning speed. Smallest value - fastest speed
