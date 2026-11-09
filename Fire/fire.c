@@ -6,8 +6,8 @@
 #define WINDOW_HEIGHT  768
 /*
 #define WHITE_TO_YELLOW  25 // 15
-#define YELLOW_TO_RED     20 //  3
-#define RED_TO_BLACK   15 //  5
+#define YELLOW_TO_RED    20 //  3
+#define RED_TO_BLACK     25 //  5
 
 #define OFFSET_RANDOM_FACTOR 40
 #define REPEAT_RANDOM_FACTOR 25
@@ -30,6 +30,8 @@ Color color_white = {255, 255, 255, 255};
 
 typedef struct {
 	Color *pixels;
+	int    width;
+	int    heigh;
 	size_t size;
 } App;
 
@@ -90,12 +92,15 @@ void App_first_frame(App *app, Color *curr_pixel, Color *prev_pixel)
 // =============================================================================
 void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel)
 {
-    int value = GetRandomValue(0, 99);
+	int value = GetRandomValue(0, 99);
 
 	if (value > OFFSET_RANDOM_FACTOR)
 	{
-		int offset = curr_pixel > (app->pixels + OFFSET_FACTOR) && prev_pixel < (app->pixels + app->size - OFFSET_FACTOR - 1) ? GetRandomValue(0, 2) - 1 : 0;
-		*curr_pixel = prev_pixel[offset * OFFSET_FACTOR];
+		int offset = curr_pixel > app->pixels && prev_pixel < app->pixels + app->size - 1
+			? GetRandomValue(0, 2) - 1
+			: 0;
+
+		*curr_pixel = prev_pixel[offset];
 
 		return;
 	}
@@ -119,7 +124,12 @@ void App_update(App *app, Frame frame_callback)
 
 		for (int col = 0; col < WINDOW_WIDTH; col++)
 		{
-		    frame_callback(app, curr_pixel, prev_pixel);
+			frame_callback(app, curr_pixel, prev_pixel);
+
+			/*if (row & 1)
+				frame_callback(app, curr_pixel, prev_pixel);
+			else 
+				*curr_pixel = *prev_pixel;*/
 
 			curr_pixel++;
 			prev_pixel++;
@@ -140,9 +150,13 @@ int main()
 {
 	SetTraceLogLevel(LOG_NONE);
 
+	// SetConfigFlags(FLAG_FULLSCREEN_MODE);
 	SetTargetFPS(TARGET_FPS);
 
-	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "RayLib");
+	int w = GetRenderWidth();
+	int h = GetRenderHeight();
+
+	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Flame");
 
 	Image image = GenImageColor(
 		WINDOW_WIDTH,
@@ -153,6 +167,8 @@ int main()
 	Texture2D texture = LoadTextureFromImage(image);
 
 	App app = {
+		// .width  = w,
+		// .heigh  = h,
 		.size   = WINDOW_WIDTH * WINDOW_HEIGHT,
 		.pixels = LoadImageColors(image),
 	};
