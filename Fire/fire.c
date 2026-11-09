@@ -17,8 +17,8 @@
 #define FADE_TO_RED     20 //  3
 #define FADE_TO_BLACK   25 //  5
 
-#define OFFSET_RANDOM_FACTOR 30
-#define REPEAT_RANDOM_FACTOR 20
+#define OFFSET_RANDOM_FACTOR 30 // Flame height. Smallest value - heighest flame size
+#define REPEAT_RANDOM_FACTOR 20 // Burning speed. Smallest value - fastest speed
 
 #define OFFSET_FACTOR 1
 
@@ -91,8 +91,6 @@ void App_first_frame(App *app)
 // =============================================================================
 void App_next_frame(App *app)
 {
-	// printf("%d\n", GetRandomValue(0, 99));
-
 	for (int row = WINDOW_HEIGHT - 2; row >= 0; row--)
 	{
 		Color *curr_pixel = app->pixels + row * WINDOW_WIDTH;
@@ -102,11 +100,9 @@ void App_next_frame(App *app)
 		{
 		    int value = GetRandomValue(0, 99);
 
-			// if (value > 70)
-			// if (value > 40)
 			if (value > OFFSET_RANDOM_FACTOR)
 			{
-    			int offset = curr_pixel > (app->pixels + OFFSET_FACTOR) && prev_pixel < (app->pixels + app->size - OFFSET_FACTOR) ? GetRandomValue(0, 2) - 1 : 0;
+    			int offset = curr_pixel > (app->pixels + OFFSET_FACTOR) && prev_pixel < (app->pixels + app->size - OFFSET_FACTOR - 1) ? GetRandomValue(0, 2) - 1 : 0;
     			*curr_pixel = prev_pixel[offset * OFFSET_FACTOR];
 
     			prev_pixel++;
@@ -115,8 +111,6 @@ void App_next_frame(App *app)
     			continue;
 			}
 
-			// if (value > 62)
-			// if (value > 25)
 			if (value > REPEAT_RANDOM_FACTOR)
 			{
 				Color color = *prev_pixel;
