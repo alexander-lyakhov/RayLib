@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include <stdio.h>
 
-#define TARGET_FPS      60
+#define TARGET_FPS      30
 #define WINDOW_WIDTH  1024
 #define WINDOW_HEIGHT  768
 /*
@@ -13,9 +13,9 @@
 #define REPEAT_RANDOM_FACTOR 25
 */
 
-#define FADE_TO_YELLOW  25 // 15
-#define FADE_TO_RED     20 //  3
-#define FADE_TO_BLACK   25 //  5
+#define FADE_TO_YELLOW  40 // 15
+#define FADE_TO_RED     25 //  3
+#define FADE_TO_BLACK   30 //  5
 
 #define OFFSET_RANDOM_FACTOR 30 // Flame height. Smallest value - heighest flame size
 #define REPEAT_RANDOM_FACTOR 20 // Burning speed. Smallest value - fastest speed
@@ -56,6 +56,8 @@ Color* App_pixel_fade(Color *color)
 	return color;
 }
 
+// void App_next_frame(App *app);
+
 // =============================================================================
 // @@@ + App_first_frame
 // =============================================================================
@@ -84,6 +86,7 @@ void App_first_frame(App *app)
 			prev_pixel++;
 		}
 	}
+	// App_next_frame(app);
 }
 
 // =============================================================================
