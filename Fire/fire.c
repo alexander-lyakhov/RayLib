@@ -38,6 +38,22 @@ typedef struct {
 typedef void (*Frame)(App *app, Color *curr_pixel, Color *prev_pixel);
 
 // =============================================================================
+// @@@ + App_init_frame
+// =============================================================================
+void App_init_frame(App *app)
+{
+	Color *p = app->pixels + app->size - WINDOW_WIDTH;
+
+	for (int i = 0; i < WINDOW_WIDTH; i++)
+		*p++ = color_white;
+
+	/*p = app->pixels + WINDOW_WIDTH * 300;
+
+	for (int i = 0; i < WINDOW_WIDTH; i++)
+		*p++ = color_white;*/
+}
+
+// =============================================================================
 // @@@ + App_pixel_fade
 // =============================================================================
 Color* App_pixel_fade(Color *color)
@@ -53,7 +69,7 @@ Color* App_pixel_fade(Color *color)
 			: color->g;
 
 	if (!color->b && !color->g && color->r)
-		if (color->r < 80)
+		if (color->r < 64)
 			color->r--;
 		else
 			color->r -= color->r > RED_TO_BLACK
@@ -64,14 +80,11 @@ Color* App_pixel_fade(Color *color)
 }
 
 // =============================================================================
-// @@@ + App_init_frame
+// @@@ + App_is_color_black
 // =============================================================================
-void App_init_frame(App *app)
+bool App_is_color_black(Color *color)
 {
-	Color *p = app->pixels + app->size - WINDOW_WIDTH;
-
-	for (int i = 0; i < WINDOW_WIDTH; i++)
-		*p++ = color_white;
+	return !color->r && !color->g && !color->b;
 }
 
 // =============================================================================
@@ -124,7 +137,8 @@ void App_update(App *app, Frame frame_callback)
 
 		for (int col = 0; col < WINDOW_WIDTH; col++)
 		{
-			frame_callback(app, curr_pixel, prev_pixel);
+			if (!App_is_color_black(prev_pixel))
+				frame_callback(app, curr_pixel, prev_pixel);
 
 			/*if (row & 1)
 				frame_callback(app, curr_pixel, prev_pixel);
