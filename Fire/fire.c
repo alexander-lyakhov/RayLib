@@ -22,10 +22,10 @@
 
 #define OFFSET_FACTOR 1
 
-Color color_black = {0, 0, 0, 255};
-Color color_teal  = {0, 128, 128, 255};
-Color color_green = {0, 255, 0, 255};
-Color color_red   = {255, 0, 0, 255};
+Color color_black = {  0,   0,   0, 255};
+Color color_teal  = {  0, 128, 128, 255};
+Color color_green = {  0, 255,   0, 255};
+Color color_red   = {255,   0,   0, 255};
 Color color_white = {255, 255, 255, 255};
 
 typedef struct {
@@ -42,9 +42,9 @@ typedef void (*Frame)(App *app, Color *curr_pixel, Color *prev_pixel);
 // =============================================================================
 void App_init_frame(App *app)
 {
-	Color *p = app->pixels + app->size - WINDOW_WIDTH;
+	Color *p = app->pixels + app->size - app->width;
 
-	for (int i = 0; i < WINDOW_WIDTH; i++)
+	for (int i = 0; i < app->width; i++)
 		*p++ = color_white;
 
 	/*p = app->pixels + WINDOW_WIDTH * 300;
@@ -130,20 +130,15 @@ void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel)
 // =============================================================================
 void App_update(App *app, Frame frame_callback)
 {
-	for (int row = WINDOW_HEIGHT - 2; row >= 0; row--)
+	for (int row = app->heigh - 2; row >= 0; row--)
 	{
-		Color *curr_pixel = app->pixels + row * WINDOW_WIDTH;
-		Color *prev_pixel = curr_pixel + WINDOW_WIDTH;
+		Color *curr_pixel = app->pixels + row * app->width;
+		Color *prev_pixel = curr_pixel + app->width;
 
-		for (int col = 0; col < WINDOW_WIDTH; col++)
+		for (int col = 0; col < app->width; col++)
 		{
 			if (!App_is_color_black(prev_pixel))
 				frame_callback(app, curr_pixel, prev_pixel);
-
-			/*if (row & 1)
-				frame_callback(app, curr_pixel, prev_pixel);
-			else 
-				*curr_pixel = *prev_pixel;*/
 
 			curr_pixel++;
 			prev_pixel++;
@@ -151,42 +146,29 @@ void App_update(App *app, Frame frame_callback)
 	}
 }
 
-// =============================================================================
-// @@@ + App_listen
-// =============================================================================
-/*int App_listen(App *app)
-{
-	if (IsKeyDown(KEY_Q))
-		return 0;
-}*/
-
 int main()
 {
 	SetTraceLogLevel(LOG_NONE);
 
-	// SetConfigFlags(FLAG_FULLSCREEN_MODE);
 	SetTargetFPS(TARGET_FPS);
+	// SetConfigFlags(FLAG_FULLSCREEN_MODE);
+
+	InitWindow(GetRenderWidth(), GetRenderHeight(), "Flame");
 
 	int w = GetRenderWidth();
 	int h = GetRenderHeight();
 
-	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Flame");
-
-	Image image = GenImageColor(
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
-		color_black
-	);
+	Image image = GenImageColor(w, h, color_black);
 
 	Texture2D texture = LoadTextureFromImage(image);
 
 	App app = {
-		// .width  = w,
-		// .heigh  = h,
-		.size   = WINDOW_WIDTH * WINDOW_HEIGHT,
+		.width  = w,
+		.heigh  = h,
+		.size   = w * h,
 		.pixels = LoadImageColors(image),
 	};
-
+	
 	App_init_frame(&app);
 	App_update(&app, App_first_frame);
 
@@ -199,7 +181,7 @@ int main()
 			DrawTexture(texture, 0, 0, color_white);
 		EndDrawing();
 	}
-
+	
 	UnloadTexture(texture);
 	UnloadImage(image);
 	UnloadImageColors(app.pixels);
