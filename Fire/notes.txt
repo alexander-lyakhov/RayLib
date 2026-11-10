@@ -14,10 +14,11 @@ RLAPI int GetScreenWidth(void);                                   // Get current
 RLAPI int GetScreenHeight(void);                                  // Get current screen height
 
 
-//
-// https://www.raylib.com/examples/textures/loader.html?name=textures_image_generation
-// https://www.raylib.com/examples/textures/loader.html?name=textures_image_processing
-//
+/*
+https://www.raylib.com/examples/textures/loader.html?name=textures_image_generation
+https://www.raylib.com/examples/textures/loader.html?name=textures_image_processing
+*/
+
 RLAPI Texture2D LoadTextureFromImage(Image image);                                                       // Load texture from image data
 RLAPI void DrawTexture(Texture2D texture, int posX, int posY, Color tint);                               // Draw a Texture2D
 RLAPI void UpdateTexture(Texture2D texture, const void *pixels);                                         // Update GPU texture with new data (pixels should be able to fill texture)

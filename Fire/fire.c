@@ -13,9 +13,9 @@
 #define REPEAT_RANDOM_FACTOR 25
 */
 
-#define WHITE_TO_YELLOW   40 // 15
-#define YELLOW_TO_RED     30 //
-#define RED_TO_BLACK      20 //  5
+#define WHITE_TO_YELLOW 40
+#define YELLOW_TO_RED   30
+#define RED_TO_BLACK    20
 
 #define OFFSET_RANDOM_FACTOR 30 // Flame height. Smallest value - heighest flame size
 #define REPEAT_RANDOM_FACTOR 20 // Burning speed. Smallest value - fastest speed
@@ -153,7 +153,8 @@ int main()
 	SetTargetFPS(TARGET_FPS);
 	// SetConfigFlags(FLAG_FULLSCREEN_MODE);
 
-	InitWindow(GetRenderWidth(), GetRenderHeight(), "Flame");
+	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Flame");
+	// InitWindow(GetRenderWidth(), GetRenderHeight(), "Flame");
 
 	int w = GetRenderWidth();
 	int h = GetRenderHeight();
