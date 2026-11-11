@@ -48,7 +48,7 @@ void App_init_frame(App *app)
 {
 	app->screen_base_line  = app->pixels + app->screen_size - app->screen_width;
 	app->screen_next_line  = app->screen_base_line - app->screen_width;
-	app->screen_last_pixel = app->pixels + app->screen_size - 1;
+	app->screen_last_pixel = app->pixels + app->screen_size - 2;
 
 	Color *p = app->screen_base_line;
 
@@ -117,12 +117,7 @@ void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel)
 
 	if (value > OFFSET_RANDOM_FACTOR)
 	{
-		int offset = prev_pixel < app->screen_last_pixel
-			? GetRandomValue(0, 2) - 1
-			: 0;
-
-		*curr_pixel = prev_pixel[offset];
-
+		*curr_pixel = prev_pixel[value % 3 - 1];
 		return;
 	}
 
