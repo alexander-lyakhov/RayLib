@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define TARGET_FPS      30
@@ -37,9 +38,19 @@ typedef struct {
 	Color *screen_base_line;
 	Color *screen_next_line;
 	Color *screen_last_pixel;
+	unsigned char *randoms;
 } App;
 
-typedef void (*Frame)(App *app, Color *curr_pixel, Color *prev_pixel);
+typedef void (*Frame)(App *app, Color *curr_pixel, Color *prev_pixel, int random_value);
+
+// =============================================================================
+// @@@ + App_fill_randoms
+// =============================================================================
+void App_fill_randoms(App *app)
+{
+	for (size_t i = 0; i < app->screen_size; i++)
+		app->randoms[i] = GetRandomValue(0, 99);
+}
 
 // =============================================================================
 // @@@ + App_init_frame
@@ -49,6 +60,8 @@ void App_init_frame(App *app)
 	app->screen_base_line  = app->pixels + app->screen_size - app->screen_width;
 	app->screen_next_line  = app->screen_base_line - app->screen_width;
 	app->screen_last_pixel = app->pixels + app->screen_size - 2;
+
+	App_fill_randoms(app);
 
 	Color *p = app->screen_base_line;
 
@@ -98,7 +111,7 @@ bool App_is_color_black(Color *color)
 // =============================================================================
 // @@@ + App_first_frame
 // =============================================================================
-void App_first_frame(App *app, Color *curr_pixel, Color *prev_pixel)
+void App_first_frame(App *app, Color *curr_pixel, Color *prev_pixel, int value)
 {
 	Color color = *prev_pixel;
 
@@ -111,9 +124,11 @@ void App_first_frame(App *app, Color *curr_pixel, Color *prev_pixel)
 // =============================================================================
 // @@@ + App_next_frame
 // =============================================================================
-void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel)
+void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel, int value)
 {
-	int value = GetRandomValue(0, 99);
+	// int value = GetRandomValue(0, 99);
+	// int value = ((uintptr_t)prev_pixel) % x % 100;
+	// int value = ((uintptr_t)prev_pixel ^ app->seed ^ curr_pixel->r ^ curr_pixel->g ^ curr_pixel->b) % 100;
 
 	if (value > OFFSET_RANDOM_FACTOR)
 	{
@@ -136,14 +151,16 @@ void App_update(App *app, Frame frame_callback)
 	Color *prev_pixel = app->screen_last_pixel;
 	Color *curr_pixel = prev_pixel - app->screen_width;
 
-	for (;curr_pixel >= app->pixels;)
+	for (int index = 0 ;curr_pixel >= app->pixels; index++)
 	{
 		if (!App_is_color_black(prev_pixel))
-			frame_callback(app, curr_pixel, prev_pixel);
+			frame_callback(app, curr_pixel, prev_pixel, app->randoms[index]);
 
 		curr_pixel--;
 		prev_pixel--;
 	}
+
+	App_fill_randoms(app);
 }
 
 int main(int argc, char *argv[])
@@ -169,6 +186,7 @@ int main(int argc, char *argv[])
 		.screen_height = h,
 		.screen_size   = w * h,
 		.pixels        = LoadImageColors(image),
+		.randoms       = malloc(w * h),
 	};
 	
 	App_init_frame(&app);
@@ -187,6 +205,7 @@ int main(int argc, char *argv[])
 	UnloadTexture(texture);
 	UnloadImage(image);
 	UnloadImageColors(app.pixels);
+	free(app.randoms);
 
 	return 0;
 }
