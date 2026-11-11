@@ -2,7 +2,7 @@
 cls
 
 set "FILENAME=%~1"
-if not defined FILENAME set "FILENAME=main.c"
+if not defined FILENAME set "FILENAME=fire.c"
 
 SET "COMPILER= C:\raylib\w64devkit\bin\gcc.exe"
 
