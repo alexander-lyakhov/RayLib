@@ -31,9 +31,12 @@ Color color_white = {255, 255, 255, 255};
 
 typedef struct {
 	Color *pixels;
-	int    width;
-	int    heigh;
-	size_t size;
+	int    screen_width;
+	int    screen_height;
+	size_t screen_size;
+	Color *screen_base_line;
+	Color *screen_next_line;
+	Color *screen_last_pixel;
 } App;
 
 typedef void (*Frame)(App *app, Color *curr_pixel, Color *prev_pixel);
@@ -43,9 +46,13 @@ typedef void (*Frame)(App *app, Color *curr_pixel, Color *prev_pixel);
 // =============================================================================
 void App_init_frame(App *app)
 {
-	Color *p = app->pixels + app->size - app->width;
+	app->screen_base_line  = app->pixels + app->screen_size - app->screen_width;
+	app->screen_next_line  = app->screen_base_line - app->screen_width;
+	app->screen_last_pixel = app->pixels + app->screen_size - 1;
 
-	for (int i = 0; i < app->width; i++)
+	Color *p = app->screen_base_line;
+
+	for (int i = 0; i < app->screen_width; i++)
 		*p++ = color_white;
 
 	/*p = app->pixels + WINDOW_WIDTH * 300;
@@ -110,7 +117,7 @@ void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel)
 
 	if (value > OFFSET_RANDOM_FACTOR)
 	{
-		int offset = prev_pixel < app->pixels + app->size - 1
+		int offset = prev_pixel < app->screen_last_pixel
 			? GetRandomValue(0, 2) - 1
 			: 0;
 
@@ -131,8 +138,8 @@ void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel)
 // =============================================================================
 void App_update(App *app, Frame frame_callback)
 {
-	Color *prev_pixel = app->pixels + app->size - 1;
-	Color *curr_pixel = prev_pixel - app->width;
+	Color *prev_pixel = app->screen_last_pixel;
+	Color *curr_pixel = prev_pixel - app->screen_width;
 
 	for (;curr_pixel >= app->pixels;)
 	{
@@ -163,10 +170,10 @@ int main(int argc, char *argv[])
 	Texture2D texture = LoadTextureFromImage(image);
 
 	App app = {
-		.width  = w,
-		.heigh  = h,
-		.size   = w * h,
-		.pixels = LoadImageColors(image),
+		.screen_width  = w,
+		.screen_height = h,
+		.screen_size   = w * h,
+		.pixels        = LoadImageColors(image),
 	};
 	
 	App_init_frame(&app);
