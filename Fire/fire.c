@@ -61,7 +61,8 @@ void App_init_frame(App *app)
 	app->screen_next_line  = app->screen_base_line - app->screen_width;
 	app->screen_last_pixel = app->pixels + app->screen_size - 2;
 
-	App_fill_randoms(app);
+	for (size_t i = 0; i < app->screen_size; i++)
+		app->randoms[i] = GetRandomValue(0, 99);
 
 	Color *p = app->screen_base_line;
 
@@ -166,9 +167,11 @@ void App_update(App *app, Frame frame_callback)
 
 		curr_pixel--;
 		prev_pixel--;
+
+		*rand_val = GetRandomValue(0, 99);
 	}
 
-	App_fill_randoms(app);
+	// App_fill_randoms(app);
 }
 
 int main(int argc, char *argv[])
