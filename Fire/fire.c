@@ -79,23 +79,31 @@ void App_init_frame(App *app)
 // =============================================================================
 Color* App_pixel_fade(Color *color)
 {
-	if (color->b)
-		color->b -= color->b > WHITE_TO_YELLOW
-			? WHITE_TO_YELLOW
-			: color->b;
-
-	if (!color->b && color->g)
-		color->g -= color->g > YELLOW_TO_RED
-			? YELLOW_TO_RED
-			: color->g;
-
 	if (!color->b && !color->g && color->r)
+	{
 		if (color->r < 64)
 			color->r--;
 		else
 			color->r -= color->r > RED_TO_BLACK
 				? RED_TO_BLACK
 				: color->r;
+		
+		return color;
+	}
+
+	if (!color->b && color->g)
+	{
+		color->g -= color->g > YELLOW_TO_RED
+			? YELLOW_TO_RED
+			: color->g;
+		
+		return color;
+	}
+
+	if (color->b)
+		color->b -= color->b > WHITE_TO_YELLOW
+			? WHITE_TO_YELLOW
+			: color->b;
 
 	return color;
 }
@@ -151,10 +159,10 @@ void App_update(App *app, Frame frame_callback)
 	Color *prev_pixel = app->screen_last_pixel;
 	Color *curr_pixel = prev_pixel - app->screen_width;
 
-	for (int index = 0 ;curr_pixel >= app->pixels; index++)
+	for (unsigned char *rand_val = app->randoms ;curr_pixel >= app->pixels; rand_val++)
 	{
 		if (!App_is_color_black(prev_pixel))
-			frame_callback(app, curr_pixel, prev_pixel, app->randoms[index]);
+			frame_callback(app, curr_pixel, prev_pixel, *rand_val);
 
 		curr_pixel--;
 		prev_pixel--;
