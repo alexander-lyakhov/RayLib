@@ -110,7 +110,7 @@ void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel)
 
 	if (value > OFFSET_RANDOM_FACTOR)
 	{
-		int offset = curr_pixel > app->pixels && prev_pixel < app->pixels + app->size - 1
+		int offset = prev_pixel < app->pixels + app->size - 1
 			? GetRandomValue(0, 2) - 1
 			: 0;
 
@@ -131,19 +131,16 @@ void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel)
 // =============================================================================
 void App_update(App *app, Frame frame_callback)
 {
-	for (int row = app->heigh - 2; row >= 0; row--)
+	Color *prev_pixel = app->pixels + app->size - 1;
+	Color *curr_pixel = prev_pixel - app->width;
+
+	for (;curr_pixel >= app->pixels;)
 	{
-		Color *curr_pixel = app->pixels + row * app->width;
-		Color *prev_pixel = curr_pixel + app->width;
+		if (!App_is_color_black(prev_pixel))
+			frame_callback(app, curr_pixel, prev_pixel);
 
-		for (int col = 0; col < app->width; col++)
-		{
-			if (!App_is_color_black(prev_pixel))
-				frame_callback(app, curr_pixel, prev_pixel);
-
-			curr_pixel++;
-			prev_pixel++;
-		}
+		curr_pixel--;
+		prev_pixel--;
 	}
 }
 
