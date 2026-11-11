@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <stdio.h>
+#include <string.h>
 
 #define TARGET_FPS      30
 #define WINDOW_WIDTH  1024
@@ -146,15 +147,16 @@ void App_update(App *app, Frame frame_callback)
 	}
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	SetTraceLogLevel(LOG_NONE);
 
 	SetTargetFPS(TARGET_FPS);
 	// SetConfigFlags(FLAG_FULLSCREEN_MODE);
 
-	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Flame");
-	// InitWindow(GetRenderWidth(), GetRenderHeight(), "Flame");
+	argc == 2 && !strcmp(argv[1], "fullscreen")
+		? InitWindow(GetRenderWidth(), GetRenderHeight(), "Flame")
+		: InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Flame");
 
 	int w = GetRenderWidth();
 	int h = GetRenderHeight();
