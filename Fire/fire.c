@@ -101,7 +101,7 @@ Color* App_pixel_fade(Color *color)
 {
 	if (!color->b && !color->g && color->r)
 	{
-		if (color->r < 64)
+		if (color->r < 80)
 			color->r--;
 		else
 			color->r -= color->r > RED_TO_BLACK
