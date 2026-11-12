@@ -17,7 +17,7 @@
 */
 
 #define WHITE_TO_YELLOW 40
-#define YELLOW_TO_RED   30
+#define YELLOW_TO_RED   20
 #define RED_TO_BLACK    20
 
 #define OFFSET_RANDOM_FACTOR 30 // Flame height. Smallest value - heighest flame size
@@ -88,9 +88,9 @@ void App_init_frame(App *app)
 	for (int i = 0; i < app->screen_width; i++)
 		*p++ = color_white;
 
-	/*p = app->pixels + WINDOW_WIDTH * 300;
+	/*p = app->pixels + app->screen_width * 384;
 
-	for (int i = 0; i < WINDOW_WIDTH; i++)
+	for (int i = 0; i < app->screen_width; i++)
 		*p++ = color_white;*/
 }
 
