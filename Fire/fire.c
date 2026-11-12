@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -43,13 +44,31 @@ typedef struct {
 
 typedef void (*Frame)(App *app, Color *curr_pixel, Color *prev_pixel, int random_value);
 
+uint32_t random_state = 123456789;
+
 // =============================================================================
-// @@@ + App_fill_randoms
+// @@@ + App_random [ xorshift32 ]
 // =============================================================================
-void App_fill_randoms(App *app)
+uint32_t App_random(int min, int max)
+{
+    uint32_t x = random_state;
+
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+
+    random_state = x;
+
+    return min + x % (max - min + 1);
+}
+
+// =============================================================================
+// @@@ + App_gen_randoms
+// =============================================================================
+void App_gen_randoms(App *app)
 {
 	for (size_t i = 0; i < app->screen_size; i++)
-		app->randoms[i] = GetRandomValue(0, 99);
+		app->randoms[i] = App_random(0, 99);
 }
 
 // =============================================================================
@@ -124,7 +143,7 @@ void App_first_frame(App *app, Color *curr_pixel, Color *prev_pixel, int value)
 {
 	Color color = *prev_pixel;
 
-	if (GetRandomValue(0, 99) > 50)
+	if (App_random(0, 99) > 50)
 		App_pixel_fade(&color);
 
 	*curr_pixel = color;
@@ -135,10 +154,6 @@ void App_first_frame(App *app, Color *curr_pixel, Color *prev_pixel, int value)
 // =============================================================================
 void App_next_frame(App *app, Color *curr_pixel, Color *prev_pixel, int value)
 {
-	// int value = GetRandomValue(0, 99);
-	// int value = ((uintptr_t)prev_pixel) % x % 100;
-	// int value = ((uintptr_t)prev_pixel ^ app->seed ^ curr_pixel->r ^ curr_pixel->g ^ curr_pixel->b) % 100;
-
 	if (value > OFFSET_RANDOM_FACTOR)
 	{
 		*curr_pixel = prev_pixel[value % 3 - 1];
@@ -168,10 +183,8 @@ void App_update(App *app, Frame frame_callback)
 		curr_pixel--;
 		prev_pixel--;
 
-		*rand_val = GetRandomValue(0, 99);
+		*rand_val = App_random(0, 99);
 	}
-
-	// App_fill_randoms(app);
 }
 
 int main(int argc, char *argv[])
