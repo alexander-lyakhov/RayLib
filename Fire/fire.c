@@ -44,20 +44,20 @@ typedef struct {
 
 typedef void (*Frame)(App *app, Color *curr_pixel, Color *prev_pixel, int random_value);
 
-uint32_t random_state = 123456789;
+uint32_t random_seed = 123456789;
 
 // =============================================================================
 // @@@ + App_random [ xorshift32 ]
 // =============================================================================
 uint32_t App_random(int min, int max)
 {
-    uint32_t x = random_state;
+    uint32_t x = random_seed;
 
     x ^= x << 13;
     x ^= x >> 17;
     x ^= x << 5;
 
-    random_state = x;
+    random_seed = x;
 
     return min + x % (max - min + 1);
 }
